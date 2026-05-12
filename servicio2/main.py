@@ -4,7 +4,7 @@ from typing import Optional, List
 from datetime import datetime
 import pyodbc
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 DB_CONFIG = {
     "server": "database-2.cza4ek4s8hav.us-east-2.rds.amazonaws.com,1433",

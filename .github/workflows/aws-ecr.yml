@@ -29,6 +29,11 @@ jobs:
           docker tag servicio2:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
 
+
+      - name: Ver nginx.conf Angular
+        run: |
+          cat ./ServicioAngular/nginx.conf
+
       - name: Build y push Servicio Angular
         run: |
           docker build --no-cache -t servicioangular ./ServicioAngular

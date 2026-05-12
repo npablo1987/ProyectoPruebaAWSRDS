@@ -34,3 +34,18 @@ jobs:
           docker build -t servicioangular ./ServicioAngular
           docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
+          
+          
+      - name: Actualizar servicioFastApi en AWS ECS
+        run: |
+          aws ecs update-service \
+          --cluster clusterpv \
+          --service ServicioFastApi-task-service-6qik50ub \
+          --force-new-deployment     
+
+      - name: Actualizar servicioAngular en AWS ECS
+        run: |
+          aws ecs update-service \
+          --cluster clusterpv \
+          --service ServicioAngular-talk-service-jw4x9ivl \
+          --force-new-deployment

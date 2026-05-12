@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Producto, ProductoCreate, ProductoUpdate } from '../models/producto.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
-  // URL actualizada para usar el ALB con reglas de enrutamiento configuradas
-  private apiUrl = 'http://lbs-pvpv2-1330869850.us-east-2.elb.amazonaws.com/api/productos';
+  // URL configurada según el entorno (desarrollo o producción)
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 

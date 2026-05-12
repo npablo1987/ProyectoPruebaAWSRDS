@@ -18,20 +18,20 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION}}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login en AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build y push servicio FastApi
         run: |
-          docker build -t servicio2 ./servicio2
+          docker build --no-cache -t servicio2 ./servicio2
           docker tag servicio2:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
 
       - name: Build y push Servicio Angular
         run: |
-          docker build -t servicioangular ./ServicioAngular
+          docker build --no-cache -t servicioangular ./ServicioAngular
           docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
           

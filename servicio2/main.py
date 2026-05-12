@@ -14,10 +14,9 @@ app = FastAPI(
     redoc_url="/api/redoc"
 )
 
-# Configurar CORS - NECESARIO para que Angular pueda hacer peticiones
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especifica los orígenes permitidos
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +29,7 @@ DB_CONFIG = {
     "database": "Productos"
 }
 
+git s
 class ProductoCreate(BaseModel):
     nombre_producto: str = Field(..., max_length=100)
     descripcion: Optional[str] = Field(None, max_length=255)

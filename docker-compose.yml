@@ -1,0 +1,25 @@
+services:
+  fastapi:
+    build:
+      context: ./servicio2
+    container_name: servicio_fastapi_RDS
+    ports:
+      - "8001:8000"
+    networks:
+      - app-network
+
+  angular:
+    build:
+      context: ./ServicioAngular
+    container_name: servicio_angular_nginx
+    ports:
+      - "4200:80"
+    depends_on:
+      - fastapi
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+

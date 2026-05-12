@@ -1,0 +1,26 @@
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.actions button {
+  min-width: 45px;
+  padding: 8px 12px;
+}
+
+table {
+  font-size: 14px;
+}
+
+table td {
+  vertical-align: middle;
+}
+
+form {
+  max-width: 800px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

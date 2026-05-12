@@ -1,0 +1,148 @@
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>📦 Gestión de Productos</h1>
+    <button class="btn btn-primary" (click)="openCreateForm()" *ngIf="!showForm">
+      ➕ Nuevo Producto
+    </button>
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    ✅ {{ success }}
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    ❌ {{ error }}
+  </div>
+
+  <div *ngIf="showForm" class="card" style="background: #f7fafc; margin-bottom: 30px;">
+    <h2>{{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+    
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nombre">Nombre del Producto *</label>
+        <input
+          type="text"
+          id="nombre"
+          class="form-control"
+          [(ngModel)]="formData.nombre_producto"
+          name="nombre_producto"
+          required
+          maxlength="100"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea
+          id="descripcion"
+          class="form-control"
+          [(ngModel)]="formData.descripcion"
+          name="descripcion"
+          rows="3"
+          maxlength="255"
+        ></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+          <label for="precio">Precio *</label>
+          <input
+            type="number"
+            id="precio"
+            class="form-control"
+            [(ngModel)]="formData.precio"
+            name="precio"
+            required
+            min="0.01"
+            step="0.01"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="stock">Stock *</label>
+          <input
+            type="number"
+            id="stock"
+            class="form-control"
+            [(ngModel)]="formData.stock"
+            name="stock"
+            required
+            min="0"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoria">Categoría</label>
+        <input
+          type="text"
+          id="categoria"
+          class="form-control"
+          [(ngModel)]="formData.categoria"
+          name="categoria"
+          maxlength="50"
+        />
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-success" [disabled]="loading">
+          {{ isEditing ? '💾 Actualizar' : '➕ Crear' }}
+        </button>
+        <button type="button" class="btn btn-danger" (click)="closeForm()" [disabled]="loading">
+          ❌ Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading && !showForm" class="loading">
+    ⏳ Cargando productos...
+  </div>
+
+  <div *ngIf="!loading && productos.length === 0 && !showForm" class="empty-state">
+    <h3>📭 No hay productos</h3>
+    <p>Comienza agregando tu primer producto</p>
+  </div>
+
+  <div *ngIf="!loading && productos.length > 0 && !showForm">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Categoría</th>
+          <th>Fecha Creación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td>{{ producto.id_producto }}</td>
+          <td><strong>{{ producto.nombre_producto }}</strong></td>
+          <td>{{ producto.descripcion || '-' }}</td>
+          <td><strong>{{ formatPrice(producto.precio) }}</strong></td>
+          <td>
+            <span [style.color]="producto.stock > 10 ? '#48bb78' : producto.stock > 0 ? '#ed8936' : '#f56565'">
+              {{ producto.stock }} unidades
+            </span>
+          </td>
+          <td>{{ producto.categoria || '-' }}</td>
+          <td>{{ formatDate(producto.fecha_creacion) }}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-warning" (click)="openEditForm(producto)" title="Editar">
+                ✏️
+              </button>
+              <button class="btn btn-danger" (click)="deleteProducto(producto.id_producto)" title="Eliminar">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
@@ -10,6 +11,15 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     redoc_url="/api/redoc"
+)
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 DB_CONFIG = {
@@ -123,8 +133,9 @@ def check_db_connection():
             "message": f"Error inesperado: {str(e)}",
             "connection_time_seconds": round(elapsed_time, 2)
         }
+#@app.post("/productos", response_model=ProductoResponse, status_code=201)
 
-@app.post("/productos", response_model=ProductoResponse, status_code=201)
+@app.post("/api/productos", response_model=ProductoResponse, status_code=201)
 def crear_producto(producto: ProductoCreate):
     try:
         connection = get_db_connection()
@@ -164,7 +175,7 @@ def crear_producto(producto: ProductoCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
-@app.get("/productos", response_model=List[ProductoResponse])
+@app.get("/api/productos", response_model=List[ProductoResponse])
 def listar_productos():
     try:
         connection = get_db_connection()
@@ -200,7 +211,7 @@ def listar_productos():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
-@app.get("/productos/{id_producto}", response_model=ProductoResponse)
+@app.get("/api/productos/{id_producto}", response_model=ProductoResponse)
 def obtener_producto(id_producto: int):
     try:
         connection = get_db_connection()
@@ -236,7 +247,7 @@ def obtener_producto(id_producto: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
-@app.put("/productos/{id_producto}", response_model=ProductoResponse)
+@app.put("/api/productos/{id_producto}", response_model=ProductoResponse)
 def actualizar_producto(id_producto: int, producto: ProductoUpdate):
     try:
         connection = get_db_connection()
@@ -309,7 +320,7 @@ def actualizar_producto(id_producto: int, producto: ProductoUpdate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error inesperado: {str(e)}")
 
-@app.delete("/productos/{id_producto}", status_code=204)
+@app.delete("/api/productos/{id_producto}", status_code=204)
 def eliminar_producto(id_producto: int):
     try:
         connection = get_db_connection()

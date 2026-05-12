@@ -7,7 +7,7 @@ import { Producto, ProductoCreate, ProductoUpdate } from '../models/producto.mod
   providedIn: 'root'
 })
 export class ProductoService {
-  private apiUrl = 'http://localhost:8001/productos';
+  private apiUrl = 'http://lbs-pvpv2-1330869850.us-east-2.elb.amazonaws.com/api';
 
   constructor(private http: HttpClient) { }
 

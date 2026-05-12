@@ -4,6 +4,8 @@ from typing import Optional, List
 from datetime import datetime
 import pyodbc
 
+
+#cambiar"
 app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
@@ -53,6 +55,7 @@ def get_db_connection():
     return pyodbc.connect(connection_string, timeout=10)
 
 
+#cambiar"
 @app.get("/api/")
 def api_home():
     return {"mensaje": "FastAPI funcionando correctamente"}

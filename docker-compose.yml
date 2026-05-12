@@ -10,7 +10,7 @@ services:
 
   angular:
     build:
-      context: ./ServicioAngular
+      context: ServicioAngular
     container_name: servicio_angular_nginx
     ports:
       - "4200:80"

@@ -4,7 +4,11 @@ from typing import Optional, List
 from datetime import datetime
 import pyodbc
 
-app = FastAPI(root_path="/api")
+app = FastAPI(
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
+    redoc_url="/api/redoc"
+)
 
 DB_CONFIG = {
     "server": "database-2.cza4ek4s8hav.us-east-2.rds.amazonaws.com,1433",
@@ -48,6 +52,10 @@ def get_db_connection():
     )
     return pyodbc.connect(connection_string, timeout=10)
 
+
+@app.get("/api/")
+def api_home():
+    return {"mensaje": "FastAPI funcionando correctamente"}
 @app.get("/")
 def inicio():
     return {"message": "¡Hola, Mundo! FastApi - ACTUALIZADO"}

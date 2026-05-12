@@ -51,9 +51,9 @@ def get_db_connection():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+def inicio():
 
 @app.get("/")
-def inicio():
     return {"message": "¡Hola, Mundo! FastApi"}
 
 @app.get("/health/db")

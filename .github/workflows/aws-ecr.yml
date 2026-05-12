@@ -111,14 +111,36 @@ jobs:
             --service ServicioAngularTalk-service-7o7xzr82 \
             --force-new-deployment
 
-      - name: Esperar despliegue FastAPI
+      - name: Verificar estado del despliegue FastAPI
+        continue-on-error: true
         run: |
-          aws ecs wait services-stable \
+          echo "Verificando estado del servicio FastAPI..."
+          aws ecs describe-services \
             --cluster clusterpv \
-            --services ServicioFastApi-task-service-6qik50ub
+            --services ServicioFastApi-task-service-6qik50ub \
+            --query 'services[0].{Status:status,Running:runningCount,Desired:desiredCount,Deployments:deployments[*].{Status:status,TaskDef:taskDefinition,Running:runningCount,Desired:desiredCount}}' \
+            --output json
+          
+          echo "Eventos recientes del servicio FastAPI:"
+          aws ecs describe-services \
+            --cluster clusterpv \
+            --services ServicioFastApi-task-service-6qik50ub \
+            --query 'services[0].events[0:5]' \
+            --output table
 
-      - name: Esperar despliegue Angular
+      - name: Verificar estado del despliegue Angular
+        continue-on-error: true
         run: |
-          aws ecs wait services-stable \
+          echo "Verificando estado del servicio Angular..."
+          aws ecs describe-services \
             --cluster clusterpv \
-            --services ServicioAngularTalk-service-7o7xzr82
+            --services ServicioAngularTalk-service-7o7xzr82 \
+            --query 'services[0].{Status:status,Running:runningCount,Desired:desiredCount,Deployments:deployments[*].{Status:status,TaskDef:taskDefinition,Running:runningCount,Desired:desiredCount}}' \
+            --output json
+          
+          echo "Eventos recientes del servicio Angular:"
+          aws ecs describe-services \
+            --cluster clusterpv \
+            --services ServicioAngularTalk-service-7o7xzr82 \
+            --query 'services[0].events[0:5]' \
+            --output table

@@ -23,6 +23,26 @@ jobs:
       - name: Login en AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Limpiar imágenes antiguas de FastAPI en ECR
+        continue-on-error: true
+        run: |
+          echo "Eliminando imágenes antiguas de FastAPI..."
+          IMAGES_TO_DELETE=$(aws ecr list-images \
+            --repository-name serviciofastapi \
+            --query 'imageIds[?imageTag!=`latest`]' \
+            --output json)
+          
+          if [ "$IMAGES_TO_DELETE" != "[]" ]; then
+            aws ecr batch-delete-image \
+              --repository-name serviciofastapi \
+              --image-ids "$IMAGES_TO_DELETE" || true
+          fi
+          
+          echo "Eliminando tag latest de FastAPI..."
+          aws ecr batch-delete-image \
+            --repository-name serviciofastapi \
+            --image-ids imageTag=latest || true
+
       - name: Build y push servicio FastApi
         run: |
           IMAGE_TAG="${GITHUB_SHA::7}"
@@ -37,6 +57,26 @@ jobs:
       - name: Ver nginx.conf Angular
         run: |
           cat ./ServicioAngular/nginx.conf
+
+      - name: Limpiar imágenes antiguas de Angular en ECR
+        continue-on-error: true
+        run: |
+          echo "Eliminando imágenes antiguas de Angular..."
+          IMAGES_TO_DELETE=$(aws ecr list-images \
+            --repository-name servicioangular \
+            --query 'imageIds[?imageTag!=`latest`]' \
+            --output json)
+          
+          if [ "$IMAGES_TO_DELETE" != "[]" ]; then
+            aws ecr batch-delete-image \
+              --repository-name servicioangular \
+              --image-ids "$IMAGES_TO_DELETE" || true
+          fi
+          
+          echo "Eliminando tag latest de Angular..."
+          aws ecr batch-delete-image \
+            --repository-name servicioangular \
+            --image-ids imageTag=latest || true
 
       - name: Build y push Servicio Angular
         run: |
@@ -76,14 +116,20 @@ jobs:
 
       - name: Registrar nueva Task Definition FastAPI
         run: |
-          aws ecs register-task-definition \
-            --cli-input-json file://fastapi-task-def-new.json
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://fastapi-task-def-new.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "Nueva Task Definition FastAPI: $TASK_DEF_ARN"
+          echo "FASTAPI_TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
 
       - name: Actualizar servicio FastAPI con nueva Task Definition
         run: |
+          echo "Actualizando servicio FastAPI con: $FASTAPI_TASK_DEF_ARN"
           aws ecs update-service \
             --cluster clusterpv \
             --service ServicioFastApi-task-service-6qik50ub \
+            --task-definition $FASTAPI_TASK_DEF_ARN \
             --force-new-deployment
 
       - name: Obtener Task Definition de Angular
@@ -113,14 +159,20 @@ jobs:
 
       - name: Registrar nueva Task Definition Angular
         run: |
-          aws ecs register-task-definition \
-            --cli-input-json file://angular-task-def-new.json
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://angular-task-def-new.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "Nueva Task Definition Angular: $TASK_DEF_ARN"
+          echo "ANGULAR_TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
 
       - name: Actualizar servicio Angular con nueva Task Definition
         run: |
+          echo "Actualizando servicio Angular con: $ANGULAR_TASK_DEF_ARN"
           aws ecs update-service \
             --cluster clusterpv \
             --service ServicioAngularTalk-service-7o7xzr82 \
+            --task-definition $ANGULAR_TASK_DEF_ARN \
             --force-new-deployment
 
       - name: Verificar estado del despliegue FastAPI

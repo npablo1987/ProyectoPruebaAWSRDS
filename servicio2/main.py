@@ -5,25 +5,7 @@ from typing import Optional, List
 from datetime import datetime
 import pyodbc
 
-
-#cambiar"
-app = FastAPI(
-    title="API de Gestión de Productos",
-    description="API REST para gestionar productos en AWS RDS SQL Server",
-    version="2.0.0",
-    docs_url="/api/docs",
-    openapi_url="/api/openapi.json",
-    redoc_url="/api/redoc"
-)
-
-# Configurar CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI()
 
 DB_CONFIG = {
     "server": "database-2.cza4ek4s8hav.us-east-2.rds.amazonaws.com,1433",

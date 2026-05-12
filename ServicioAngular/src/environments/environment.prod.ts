@@ -1,5 +1,5 @@
 // Configuración para producción (AWS)
 export const environment = {
   production: true,
-  apiUrl: 'http://lbs-pvpv2-1330869850.us-east-2.elb.amazonaws.com/api/productos'
+  apiUrl: 'http://localhost:8001/api/productos'
 };

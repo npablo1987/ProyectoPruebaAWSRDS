@@ -32,5 +32,5 @@ jobs:
       - name: Build y push Servicio Angular
         run: |
           docker build -t servicioangular ./ServicioAngular
-          docker tag serviciofastapi:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
+          docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest

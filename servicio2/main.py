@@ -8,6 +8,9 @@ import pyodbc
 
 #cambiar"
 app = FastAPI(
+    title="API de Gestión de Productos",
+    description="API REST para gestionar productos en AWS RDS SQL Server",
+    version="2.0.0",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     redoc_url="/api/redoc"
@@ -71,7 +74,15 @@ def api_home():
     return {"mensaje": "FastAPI funcionando correctamente"}
 @app.get("/")
 def inicio():
-    return {"message": "¡Hola, Mundo! FastApi - ACTUALIZADO"}
+    return {
+        "message": "API de Gestión de Productos - ACTUALIZADO v2.0",
+        "status": "running",
+        "endpoints": {
+            "docs": "/api/docs",
+            "health": "/health",
+            "productos": "/api/productos"
+        }
+    }
 
 @app.get("/health")
 def health():

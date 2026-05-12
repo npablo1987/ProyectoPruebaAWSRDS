@@ -7,6 +7,7 @@ import { Producto, ProductoCreate, ProductoUpdate } from '../models/producto.mod
   providedIn: 'root'
 })
 export class ProductoService {
+  // URL actualizada para usar el ALB con reglas de enrutamiento configuradas
   private apiUrl = 'http://lbs-pvpv2-1330869850.us-east-2.elb.amazonaws.com/api/productos';
 
   constructor(private http: HttpClient) { }

@@ -48,6 +48,10 @@ def get_db_connection():
     )
     return pyodbc.connect(connection_string, timeout=10)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.get("/")
 def inicio():
     return {"message": "¡Hola, Mundo! FastApi"}

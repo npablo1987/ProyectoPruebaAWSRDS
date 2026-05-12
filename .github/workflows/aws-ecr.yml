@@ -29,7 +29,6 @@ jobs:
           docker tag servicio2:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
 
-
       - name: Ver nginx.conf Angular
         run: |
           cat ./ServicioAngular/nginx.conf
@@ -39,18 +38,87 @@ jobs:
           docker build --no-cache -t servicioangular ./ServicioAngular
           docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
-          
-          
-      - name: Actualizar servicioFastApi en AWS ECS
-        run: |
-          aws ecs update-service \
-          --cluster clusterpv \
-          --service ServicioFastApi-task-service-6qik50ub \
-          --force-new-deployment     
 
-      - name: Actualizar servicioAngular en AWS ECS
+      - name: Obtener Task Definition de FastAPI
+        run: |
+          aws ecs describe-services \
+            --cluster clusterpv \
+            --services ServicioFastApi-task-service-6qik50ub \
+            --query 'services[0].taskDefinition' \
+            --output text > fastapi-task-arn.txt
+          
+          TASK_DEF=$(cat fastapi-task-arn.txt)
+          aws ecs describe-task-definition \
+            --task-definition $TASK_DEF \
+            --query 'taskDefinition' > fastapi-task-def.json
+
+      - name: Actualizar imagen en Task Definition FastAPI
+        run: |
+          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest"
+          
+          jq --arg IMAGE "$NEW_IMAGE" \
+            'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | 
+            .containerDefinitions[0].image = $IMAGE' \
+            fastapi-task-def.json > fastapi-task-def-new.json
+          
+          cat fastapi-task-def-new.json
+
+      - name: Registrar nueva Task Definition FastAPI
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://fastapi-task-def-new.json
+
+      - name: Actualizar servicio FastAPI con nueva Task Definition
         run: |
           aws ecs update-service \
-          --cluster clusterpv \
-          --service ServicioAngularTalk-service-7o7xzr82 \
-          --force-new-deployment
+            --cluster clusterpv \
+            --service ServicioFastApi-task-service-6qik50ub \
+            --force-new-deployment
+
+      - name: Obtener Task Definition de Angular
+        run: |
+          aws ecs describe-services \
+            --cluster clusterpv \
+            --services ServicioAngularTalk-service-7o7xzr82 \
+            --query 'services[0].taskDefinition' \
+            --output text > angular-task-arn.txt
+          
+          TASK_DEF=$(cat angular-task-arn.txt)
+          aws ecs describe-task-definition \
+            --task-definition $TASK_DEF \
+            --query 'taskDefinition' > angular-task-def.json
+
+      - name: Actualizar imagen en Task Definition Angular
+        run: |
+          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest"
+          
+          jq --arg IMAGE "$NEW_IMAGE" \
+            'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | 
+            .containerDefinitions[0].image = $IMAGE' \
+            angular-task-def.json > angular-task-def-new.json
+          
+          cat angular-task-def-new.json
+
+      - name: Registrar nueva Task Definition Angular
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://angular-task-def-new.json
+
+      - name: Actualizar servicio Angular con nueva Task Definition
+        run: |
+          aws ecs update-service \
+            --cluster clusterpv \
+            --service ServicioAngularTalk-service-7o7xzr82 \
+            --force-new-deployment
+
+      - name: Esperar despliegue FastAPI
+        run: |
+          aws ecs wait services-stable \
+            --cluster clusterpv \
+            --services ServicioFastApi-task-service-6qik50ub
+
+      - name: Esperar despliegue Angular
+        run: |
+          aws ecs wait services-stable \
+            --cluster clusterpv \
+            --services ServicioAngularTalk-service-7o7xzr82

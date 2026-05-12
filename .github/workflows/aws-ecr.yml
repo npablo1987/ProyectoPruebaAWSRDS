@@ -52,5 +52,5 @@ jobs:
         run: |
           aws ecs update-service \
           --cluster clusterpv \
-          --service ServicioAngular-talk-service-jw4x9ivl \
+          --service ServicioAngularTalk-service-7o7xzr82 \
           --force-new-deployment

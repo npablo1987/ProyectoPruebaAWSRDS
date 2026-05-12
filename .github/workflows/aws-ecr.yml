@@ -131,6 +131,11 @@ jobs:
             --service ServicioFastApi-task-service-6qik50ub \
             --task-definition $FASTAPI_TASK_DEF_ARN \
             --force-new-deployment
+      
+      - name: Esperar despliegue FastAPI (máximo 10 minutos)
+        run: |
+          echo "Esperando que el servicio FastAPI se estabilice..."
+          timeout 600 bash -c 'until [ $(aws ecs describe-services --cluster clusterpv --services ServicioFastApi-task-service-6qik50ub --query "services[0].runningCount" --output text) -ge 1 ]; do echo "Esperando..."; sleep 10; done' || echo "Timeout alcanzado, continuando..."
 
       - name: Obtener Task Definition de Angular
         run: |
@@ -174,6 +179,11 @@ jobs:
             --service ServicioAngularTalk-service-7o7xzr82 \
             --task-definition $ANGULAR_TASK_DEF_ARN \
             --force-new-deployment
+      
+      - name: Esperar despliegue Angular (máximo 10 minutos)
+        run: |
+          echo "Esperando que el servicio Angular se estabilice..."
+          timeout 600 bash -c 'until [ $(aws ecs describe-services --cluster clusterpv --services ServicioAngularTalk-service-7o7xzr82 --query "services[0].runningCount" --output text) -ge 1 ]; do echo "Esperando..."; sleep 10; done' || echo "Timeout alcanzado, continuando..."
 
       - name: Verificar estado del despliegue FastAPI
         continue-on-error: true

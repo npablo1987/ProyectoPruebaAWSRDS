@@ -25,9 +25,14 @@ jobs:
 
       - name: Build y push servicio FastApi
         run: |
+          IMAGE_TAG="${GITHUB_SHA::7}"
+          echo "Building FastAPI with tag: $IMAGE_TAG"
           docker build --no-cache -t servicio2 ./servicio2
+          docker tag servicio2:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:$IMAGE_TAG
           docker tag servicio2:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
+          docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:$IMAGE_TAG
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest
+          echo "FASTAPI_IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Ver nginx.conf Angular
         run: |
@@ -35,9 +40,14 @@ jobs:
 
       - name: Build y push Servicio Angular
         run: |
+          IMAGE_TAG="${GITHUB_SHA::7}"
+          echo "Building Angular with tag: $IMAGE_TAG"
           docker build --no-cache -t servicioangular ./ServicioAngular
+          docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:$IMAGE_TAG
           docker tag servicioangular:latest 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
+          docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:$IMAGE_TAG
           docker push 705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest
+          echo "ANGULAR_IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
       - name: Obtener Task Definition de FastAPI
         run: |
@@ -54,7 +64,8 @@ jobs:
 
       - name: Actualizar imagen en Task Definition FastAPI
         run: |
-          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:latest"
+          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/serviciofastapi:$FASTAPI_IMAGE_TAG"
+          echo "Actualizando FastAPI a imagen: $NEW_IMAGE"
           
           jq --arg IMAGE "$NEW_IMAGE" \
             'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | 
@@ -90,7 +101,8 @@ jobs:
 
       - name: Actualizar imagen en Task Definition Angular
         run: |
-          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:latest"
+          NEW_IMAGE="705690519982.dkr.ecr.us-east-2.amazonaws.com/servicioangular:$ANGULAR_IMAGE_TAG"
+          echo "Actualizando Angular a imagen: $NEW_IMAGE"
           
           jq --arg IMAGE "$NEW_IMAGE" \
             'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) | 

@@ -29,7 +29,7 @@ DB_CONFIG = {
     "database": "Productos"
 }
 
-git s
+
 class ProductoCreate(BaseModel):
     nombre_producto: str = Field(..., max_length=100)
     descripcion: Optional[str] = Field(None, max_length=255)
